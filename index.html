@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>noise playground</title>
+    <link type="text/css" href="style.css" rel="stylesheet" />
+    <script src="res/jquery.js"></script>
+</head>
+
+<body>
+
+    <div class="panel">
+        <div class="panel_element">
+            <button id="button_generate">generate</button>
+        </div>
+        <div class="panel_element">
+            <button id="button_download">download</button>
+        </div>
+    </div>
+    <div class="display">
+        <canvas id="canvas" width="400" height="500"></canvas>
+    </div>
+
+    <script type="module">
+        "use strict";
+        import { download } from './res/download.js';
+        import { WhiteNoise, WorleyNoise } from './noise.js';
+
+        class Manager {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.width = canvas.width;
+                this.height = canvas.height;
+                this.ctx = canvas.getContext("2d");
+
+                this.image_data = this.ctx.getImageData(0, 0, this.width, this.height);
+                this.raw_arr_len = this.image_data.data.length;
+                //In Javascript objects and arrays follows pass by reference. so if we are passing object or array 
+                //as an argument to the method, then there is a possibility that value of the object can change
+                this.raw_arr = this.image_data.data;
+                this.noise_maker = null;
+            }
+            set_maker(noise_maker) {
+                this.noise_maker = noise_maker;
+            }
+            generate(finish_callback) {
+                var i = 0;
+                var n = 0;
+                var uv = [];
+                var color = [];
+
+                while (i < this.raw_arr_len) {
+                    uv = this.get_uv(n);
+                    color = this.noise_maker.make(uv);
+                    this.raw_arr[i] = color[0];
+                    i++;
+                    this.raw_arr[i] = color[1];
+                    i++;
+                    this.raw_arr[i] = color[2];
+                    i++;
+                    this.raw_arr[i] = color[3];
+                    i++;
+                    n++;
+                }
+                this.ctx.putImageData(this.image_data, 0, 0);
+                finish_callback();
+            }
+            get_uv(n) {
+                var u = 0;
+                var v = 0;
+                u = n % this.width;
+                v = Math.floor(n / this.width);
+                return [u, v];
+            }
+            download_file(name) {
+                var data_URL = this.canvas.toDataURL("image/png");
+                download(data_URL, name + ".png", "image/png");
+            }
+        }
+        var canvas = document.getElementById("canvas");
+        var manager = new Manager(canvas);
+
+        var canvas_info = {
+            width: canvas.width,
+            height: canvas.height,
+            make_type: 1
+        };
+        var white_noise = new WhiteNoise(canvas_info);
+        var points_shape = [2, 9];
+        var threshold_range = [0.1, 0.61];
+        var worley_noise = new WorleyNoise(canvas_info, points_shape, threshold_range);
+
+        manager.set_maker(worley_noise);
+        manager.generate(function () { });
+
+        // $('#button_generate').click(function () {
+        //     var finish_callback = function () {
+        //         alert('finished!');
+        //     };
+        //     manager.generate(finish_callback);
+        // });
+
+        // $('#button_download').click(function () {
+        //     manager.download_file('noise_playground');
+        // });
+    </script>
+
+</body>
+
+</html>
