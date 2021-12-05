@@ -5,6 +5,13 @@ class Color {
 		this.b = b;
 		this.a = a;
 	}
+    copy(v) {
+		this.r = v.r;
+		this.g = v.g;
+		this.b = v.b;
+		this.a = v.a;
+        return this;
+    }
     rand(){
 		this.r = Math.floor(Math.random() * 256);
 		this.g = Math.floor(Math.random() * 256);
@@ -17,6 +24,12 @@ class Color {
 		this.b = Math.floor(Math.random() * 256);
         this.a = Math.floor(Math.random() * 256);
         return this;
+    }
+    multiply_scalar(scalar){
+        this.r *= scalar;
+		this.g *= scalar;
+		this.b *= scalar;
+        return this; 
     }
     to_arr(){
         return [this.r,this.g,this.b,this.a];

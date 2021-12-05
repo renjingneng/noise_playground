@@ -19,13 +19,17 @@ class Vector2 {
     }
     manhattan_length() {
         return Math.abs(this.x) + Math.abs(this.y);
-
     }
     normalize() {
         var len = this.length();
         this.x = this.x / len;
         this.y = this.y / len;
         return this;
+    }
+    multiply_scalar(scalar){
+        this.x *= scalar;
+		this.y *= scalar;
+        return this; 
     }
 }
 class Vector3 {
@@ -59,6 +63,12 @@ class Vector3 {
         this.y = this.y / len;
         this.z = this.z / len;
         return this;
+    }
+    multiply_scalar(scalar){
+        this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
+        return this; 
     }
 }
 export { Vector2,Vector3 };

@@ -35,27 +35,31 @@
         var canvas_info = {
             width: canvas.width,
             height: canvas.height,
-            make_type: 2
+            variant_no: 3
         };
-        //var white_noise = new WhiteNoise(canvas_info);
+        //white_noise
+        var white_noise = new WhiteNoise(canvas_info);
 
-        var points_shape = [2, 3];
-        var threshold_range = [0.1, 1];
-        var worley_noise = new WorleyNoise(canvas_info, points_shape, threshold_range);
+        //worley_noise
+        var params = {
+            points_shape: [2, 3],
+            threshold_range: [0, 0.7],
+            steps: 14
+        };
+        var worley_noise = new WorleyNoise(canvas_info,params);
 
         manager.set_maker(worley_noise);
-        manager.generate(function () { });
 
-        // $('#button_generate').click(function () {
-        //     var finish_callback = function () {
-        //         alert('finished!');
-        //     };
-        //     manager.generate(finish_callback);
-        // });
+        $('#button_generate').click(function () {
+            var finish_callback = function () {
+                alert('finished!');
+            };
+            manager.generate(finish_callback);
+        });
 
-        // $('#button_download').click(function () {
-        //     manager.download_file('noise_playground');
-        // });
+        $('#button_download').click(function () {
+            manager.download_file('noise_playground');
+        });
     </script>
 
 </body>
