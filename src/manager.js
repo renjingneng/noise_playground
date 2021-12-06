@@ -4,9 +4,8 @@ class Manager {
         this.canvas = canvas;
         this.width = canvas.width;
         this.height = canvas.height;
-        this.ctx = canvas.getContext("2d");
 
-        this.image_data = this.ctx.getImageData(0, 0, this.width, this.height);
+        this.image_data = canvas.getContext("2d").getImageData(0, 0, this.width, this.height);
         this.raw_arr_len = this.image_data.data.length;
         //In Javascript objects and arrays follows pass by reference. so if we are passing object or array 
         //as an argument to the method, then there is a possibility that value of the object can change
@@ -35,7 +34,7 @@ class Manager {
             i++;
             n++;
         }
-        this.ctx.putImageData(this.image_data, 0, 0);
+        document.getElementById("canvas").getContext("2d").putImageData(this.image_data, 0, 0);
         finish_callback();
     }
     get_uv(n) {

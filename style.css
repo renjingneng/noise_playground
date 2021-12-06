@@ -3,12 +3,15 @@
     border-width: 2px;
     border-color: black;
 }
+
+  .el-aside {
+    background-color: #a5cbd1;
+  }
+
+
 .panel {
-    margin: 3px;
-}
-.panel_element {
-    margin: 5px;
+    margin: 20px;
 }
 .display {
-    margin: 3px;
+    margin: 10px;
 }

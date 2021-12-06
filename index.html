@@ -5,63 +5,123 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>noise playground</title>
-    <link type="text/css" href="style.css" rel="stylesheet" />
-    <script src="res/jquery.js"></script>
+    <link type="text/css" rel="stylesheet" href="./res/element_plus.css" />
+    <link type="text/css" rel="stylesheet" href="./style.css" />
+    <script src="./res/vue.js"></script>
+    <script src="./res/element_plus.js"></script>
 </head>
 
 <body>
-
-    <div class="panel">
-        <div class="panel_element">
-            <button id="button_generate">generate</button>
-        </div>
-        <div class="panel_element">
-            <button id="button_download">download</button>
-        </div>
+    <div id="app">
+        <el-container>
+            <el-aside>
+                <el-scrollbar min-size.number="30">
+                    <div class="panel">
+                        <el-form size="mini">
+                            <el-form-item label="noise type">
+                                <el-select placeholder="white_noise" v-model="params.noise_type">
+                                    <el-option label="white noise" value="white_noise"></el-option>
+                                    <el-option label="worley noise" value="worley_noise"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <!-- <el-form-item label="item2">
+                                    <el-checkbox-group v-model="item2">
+                                        <el-checkbox label="Online activities"></el-checkbox>
+                                        <el-checkbox label="Promotion activities"></el-checkbox>
+                                        <el-checkbox label="Offline activities"></el-checkbox>
+                                        <el-checkbox label="Simple brand exposure"></el-checkbox>
+                                    </el-checkbox-group>
+                                </el-form-item> -->
+                            <!-- <el-form-item label="Activity name">
+                                    <el-slider v-model="item3"></el-slider>
+                                </el-form-item> -->
+                            <!-- <el-form-item label="Activity name">
+                                    <el-color-picker v-model="color2" />
+                                </el-form-item> -->
+                            <el-form-item>
+                                <el-button type="primary" v-on:click="download_file">download file</el-button>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" v-on:click="generate_noise">generate noise</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </el-scrollbar>
+            </el-aside>
+            <el-main>
+                <el-scrollbar min-size.number='30'>
+                    <div class="display">
+                        <canvas id="canvas" width="400" height="300"></canvas>
+                    </div>
+                </el-scrollbar>
+            </el-main>
+        </el-container>
     </div>
-    <div class="display">
-        <canvas id="canvas" width="300" height="400"></canvas>
-    </div>
-
-    <script type="module">
-        "use strict";
-        import { WhiteNoise, WorleyNoise } from './src/noise.js';
-        import { Manager } from './src/manager.js';
-
-
-        var canvas = document.getElementById("canvas");
-        var manager = new Manager(canvas);
-
-        var canvas_info = {
-            width: canvas.width,
-            height: canvas.height,
-            variant_no: 3
-        };
-        //white_noise
-        var white_noise = new WhiteNoise(canvas_info);
-
-        //worley_noise
-        var params = {
-            points_shape: [2, 3],
-            threshold_range: [0, 0.7],
-            steps: 14
-        };
-        var worley_noise = new WorleyNoise(canvas_info,params);
-
-        manager.set_maker(worley_noise);
-
-        $('#button_generate').click(function () {
-            var finish_callback = function () {
-                alert('finished!');
-            };
-            manager.generate(finish_callback);
-        });
-
-        $('#button_download').click(function () {
-            manager.download_file('noise_playground');
-        });
-    </script>
-
+    
 </body>
+<script type="module">
+    "use strict";
+    import { WhiteNoise, WorleyNoise } from './src/noise.js';
+    import { Manager } from './src/manager.js';
+
+    var canvas = document.getElementById("canvas");
+    var canvas_info = {
+        width: canvas.width,
+        height: canvas.height,
+        variant_no: 3
+    };
+    var params = {
+        points_shape: [2, 3],
+        threshold_range: [0, 0.7],
+        steps: 14
+    };
+
+    var manager = new Manager(canvas);
+    var white_noise = new WhiteNoise(canvas_info);
+    var worley_noise = new WorleyNoise(canvas_info, params);
+
+
+
+    const App = {
+        data: function () {
+            return {
+                params: {
+                    noise_type: 'white_noise'
+                }
+                // item3: 40,
+                // item4: [3,30],
+                // color1:'rgba(0, 255, 0, 1)',
+            }
+        },
+        computed: {
+            event_aggregater: function () {
+                var aggregated_params = {
+                    noise_type: this.params.noise_type
+                };
+                return aggregated_params;
+            }
+        },
+        methods: {
+            download_file: function () {
+                manager.download_file('noise_playground');
+            },
+            generate_noise: function () {
+                worley_noise.reset();
+                manager.set_maker(worley_noise);
+                manager.generate(function () {
+                    //alert('finished!');
+                });
+            }
+        },
+        watch: {
+            event_aggregater: function (new_val, old_val) {
+                console.log(new_val);
+            }
+        }
+    };
+    const app = Vue.createApp(App);
+    app.use(ElementPlus);
+    app.mount("#app");
+</script>
 
 </html>

@@ -7,6 +7,9 @@ class Noise {
         this.uv_max = [canvas_info.width - 1, canvas_info.height - 1];
         this.variant_no = canvas_info.variant_no;
     }
+    set_variant_no(variant_no){
+        this.variant_no = variant_no;
+    }
 }
 
 class WhiteNoise extends Noise {
@@ -38,12 +41,19 @@ class WorleyNoise extends Noise {
         super(canvas_info);
         this.points_shape = params.points_shape;
         this.threshold_range = params.threshold_range;
+        this.steps = params.steps;
+        this.reset();
+    }
+    set_params(params){
+        this.points_shape = params.points_shape;
+        this.threshold_range = params.threshold_range;
+        this.steps = params.steps;
+    }
+    reset(){
         this.points = [];
         this.bg_color = (new Color()).rand();
         this.a_color = (new Color()).rand();
         this.b_color = (new Color()).rand();
-        this.steps = params.steps;
-
         //generate  feature points
         if (this.variant_no == 1 || this.variant_no == 3) {
             var num_points = this.points_shape[0] * this.points_shape[1];
