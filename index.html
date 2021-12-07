@@ -51,35 +51,19 @@
             <el-main>
                 <el-scrollbar min-size.number='30'>
                     <div class="display">
-                        <canvas id="canvas" width="400" height="300"></canvas>
+                        <canvas id="canvas" width="700" height="600"></canvas>
                     </div>
                 </el-scrollbar>
             </el-main>
         </el-container>
     </div>
-    
+
 </body>
 <script type="module">
     "use strict";
-    import { WhiteNoise, WorleyNoise } from './src/noise.js';
+    import { CellNoise } from './src/noise/cell_noise.js';
+    import { WhiteNoise } from './src/noise/white_noise.js';
     import { Manager } from './src/manager.js';
-
-    var canvas = document.getElementById("canvas");
-    var canvas_info = {
-        width: canvas.width,
-        height: canvas.height,
-        variant_no: 3
-    };
-    var params = {
-        points_shape: [2, 3],
-        threshold_range: [0, 0.7],
-        steps: 14
-    };
-
-    var manager = new Manager(canvas);
-    var white_noise = new WhiteNoise(canvas_info);
-    var worley_noise = new WorleyNoise(canvas_info, params);
-
 
 
     const App = {
@@ -95,10 +79,9 @@
         },
         computed: {
             event_aggregater: function () {
-                var aggregated_params = {
-                    noise_type: this.params.noise_type
-                };
-                return aggregated_params;
+                console.log('computed');
+                console.log(this.params.noise_type);
+                return this.params.noise_type;
             }
         },
         methods: {
@@ -106,17 +89,47 @@
                 manager.download_file('noise_playground');
             },
             generate_noise: function () {
-                worley_noise.reset();
-                manager.set_maker(worley_noise);
-                manager.generate(function () {
+                this.cell_noise.init();
+                this.manager.generate(function () {
                     //alert('finished!');
                 });
             }
         },
         watch: {
             event_aggregater: function (new_val, old_val) {
+                console.log('watch');
                 console.log(new_val);
+                console.log(this.dd);
             }
+        },
+        mounted: function () {
+            this.dd = 'd';
+
+            var canvas = document.getElementById("canvas");
+            var params = {
+                points_shape: [2, 3],
+                threshold_range: [0, 0.7],
+                steps: 14
+            };
+
+            this.manager = new Manager(canvas);
+            this.white_noise = new WhiteNoise();
+            this.white_noise.set_variant_no(1);
+            this.white_noise.set_canvas_width(canvas.width);
+            this.white_noise.set_canvas_height(canvas.height);
+            this.white_noise.set_params({});
+            this.white_noise.init();
+            this.cell_noise = new CellNoise();
+            this.cell_noise.set_variant_no(3);
+            this.cell_noise.set_canvas_width(canvas.width);
+            this.cell_noise.set_canvas_height(canvas.height);
+            this.cell_noise.set_params(params);
+            this.cell_noise.init();
+            this.manager.set_maker(this.cell_noise);
+            this.manager.generate(function () {
+                //alert('finished!');
+            });
+
         }
     };
     const app = Vue.createApp(App);

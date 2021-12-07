@@ -7,7 +7,10 @@
   .el-aside {
     background-color: #a5cbd1;
   }
-
+  .el-main {
+    background-color: #818383;
+    text-align: center;
+  }
 
 .panel {
     margin: 20px;

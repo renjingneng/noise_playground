@@ -34,7 +34,7 @@ class Manager {
             i++;
             n++;
         }
-        document.getElementById("canvas").getContext("2d").putImageData(this.image_data, 0, 0);
+        this.canvas.getContext("2d").putImageData(this.image_data, 0, 0);
         finish_callback();
     }
     get_uv(n) {

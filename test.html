@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="module">
+        class Vector {
+            constructor(x) {
+                this.x = x;
+            }
+        }
+        class Vector2 extends Vector {
+            constructor(x = 255) {
+                super(x);
+            }
+            get r() {
+                return this.x;
+            }
+            set r(val) {
+                return this.x = val;
+            }
+            rand() {
+                this.r = 100;
+            }
+            test(val) {
+                return val === this;
+            }
+        }
+        class Vector3 extends Vector {
+            constructor() {
+                super();
+            }
+        }
+        var vector2 = new Vector2();
+        //    console.log(vector2 instanceof Vector2);
+        //    console.log(vector2 instanceof Vector3);
+        //    console.log(vector2 instanceof Vector);
+
+        console.log(vector2);
+        console.log(vector2.x);
+        console.log(vector2.r);
+        vector2.r = 10;
+        console.log(vector2.r);
+        vector2.rand();
+        console.log(vector2.r);
+        console.log(vector2.test(vector2));
+    </script>
+</body>
+
+</html>
