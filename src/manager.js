@@ -1,4 +1,7 @@
 import { download } from '../res/download.js';
+import { CellNoise } from './noise/cell_noise.js';
+import { WhiteNoise } from './noise/white_noise.js';
+import { Color3 } from './math/color3.js';
 class Manager {
     constructor(canvas) {
         this.canvas = canvas;
@@ -11,9 +14,40 @@ class Manager {
         //as an argument to the method, then there is a possibility that value of the object can change
         this.raw_arr = this.image_data.data;
         this.noise_maker = null;
+        this.container = {};
     }
-    set_maker(noise_maker) {
-        this.noise_maker = noise_maker;
+    set_maker(params) {
+        // set up noise_maker
+        if (this.container[params.noise_type] == null){
+            if (params.noise_type == 'white_noise') {
+                this.container[params.noise_type] = new WhiteNoise();
+            } else if (params.noise_type == 'cell_noise') {
+                this.container[params.noise_type] = new CellNoise();
+            }
+        }
+        this.noise_maker = this.container[params.noise_type];
+        this.noise_maker.set_variant_no(params.variant_no);
+        this.noise_maker.set_canvas_width(this.width);
+        this.noise_maker.set_canvas_height(this.height);
+        // set up params
+        if (params.noise_type == 'white_noise') {
+            this.noise_maker.set_params({});
+        } else if (params.noise_type == 'cell_noise') {
+            let bg_color_arr = params.bg_color.match(/[0-9]+/g);
+            let a_color_arr = params.a_color.match(/[0-9]+/g);
+            let b_color_arr = params.b_color.match(/[0-9]+/g);
+            this.noise_maker.set_params({
+                points_shape: [params.points_shape_x, params.points_shape_y],
+                threshold_range: [params.threshold_range[0]/100, params.threshold_range[1]/100],
+                steps:params.steps,
+                bg_color:new Color3(bg_color_arr[0]/255,bg_color_arr[1]/255,bg_color_arr[2]/255),
+                a_color:new Color3(a_color_arr[0]/255,a_color_arr[1]/255,a_color_arr[2]/255),
+                b_color:new Color3(b_color_arr[0]/255,b_color_arr[1]/255,b_color_arr[2]/255),
+            });
+        }
+    }
+    init_maker() {
+        this.noise_maker.init();
     }
     generate(finish_callback) {
         var i = 0;

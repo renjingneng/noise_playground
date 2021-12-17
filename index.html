@@ -9,6 +9,7 @@
     <link type="text/css" rel="stylesheet" href="./style.css" />
     <script src="./res/vue.js"></script>
     <script src="./res/element_plus.js"></script>
+    <script src="./res/lodash.js"></script>
 </head>
 
 <body>
@@ -19,30 +20,44 @@
                     <div class="panel">
                         <el-form size="mini">
                             <el-form-item label="noise type">
-                                <el-select placeholder="white_noise" v-model="params.noise_type">
+                                <el-select placeholder="white_noise" v-model="noise_type">
                                     <el-option label="white noise" value="white_noise"></el-option>
-                                    <el-option label="worley noise" value="worley_noise"></el-option>
+                                    <el-option label="cell noise" value="cell_noise"></el-option>
                                 </el-select>
                             </el-form-item>
-                            <!-- <el-form-item label="item2">
-                                    <el-checkbox-group v-model="item2">
-                                        <el-checkbox label="Online activities"></el-checkbox>
-                                        <el-checkbox label="Promotion activities"></el-checkbox>
-                                        <el-checkbox label="Offline activities"></el-checkbox>
-                                        <el-checkbox label="Simple brand exposure"></el-checkbox>
-                                    </el-checkbox-group>
-                                </el-form-item> -->
-                            <!-- <el-form-item label="Activity name">
-                                    <el-slider v-model="item3"></el-slider>
-                                </el-form-item> -->
-                            <!-- <el-form-item label="Activity name">
-                                    <el-color-picker v-model="color2" />
-                                </el-form-item> -->
+                            <el-form-item label="variant no">
+                                <el-select placeholder="1" v-model="variant_no">
+                                    <el-option label="1" value="1"></el-option>
+                                    <el-option label="2" value="2"></el-option>
+                                    <el-option label="3" value="3"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="num of horizontal points">
+                                <el-input-number v-model="points_shape_x" :min="2" :max="10"  />
+                            </el-form-item>
+                            <el-form-item label="num of vertical points">
+                                <el-input-number v-model="points_shape_y" :min="2" :max="10"  />
+                            </el-form-item>
+                             <el-form-item label="threshold range">
+                                    <el-slider v-model="threshold_range" range></el-slider>
+                                </el-form-item>
+                                <el-form-item label="steps">
+                                    <el-slider v-model="steps" :min="3" :max="20"></el-slider>
+                                </el-form-item>
+                                <el-form-item label="background color">
+                                    <el-color-picker v-model="bg_color" color-format="rgb"/>
+                                </el-form-item>
+                                <el-form-item label="a color">
+                                    <el-color-picker v-model="a_color" color-format="rgb"/>
+                                </el-form-item>
+                                <el-form-item label="b color">
+                                    <el-color-picker v-model="b_color" color-format="rgb" />
+                                </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" v-on:click="download_file">download file</el-button>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" v-on:click="generate_noise">generate noise</el-button>
+                                <el-button type="primary" v-on:click="regenerate">regenerate</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -61,75 +76,65 @@
 </body>
 <script type="module">
     "use strict";
-    import { CellNoise } from './src/noise/cell_noise.js';
-    import { WhiteNoise } from './src/noise/white_noise.js';
+
     import { Manager } from './src/manager.js';
+    import { Color3 } from './src/math/color3.js';
 
 
     const App = {
         data: function () {
             return {
-                params: {
-                    noise_type: 'white_noise'
-                }
-                // item3: 40,
-                // item4: [3,30],
-                // color1:'rgba(0, 255, 0, 1)',
+                noise_type: 'white_noise',
+                variant_no: 1,
+                points_shape_x: 3,
+                points_shape_y: 3,
+                threshold_range:[1,80],
+                steps:6,
+                bg_color:'rgba(255, 255, 255, 1)',
+                a_color:'rgba(0, 255, 0, 1)',
+                b_color:'rgba(255, 0, 0, 1)',
             }
         },
         computed: {
             event_aggregater: function () {
-                console.log('computed');
-                console.log(this.params.noise_type);
-                return this.params.noise_type;
+                return {
+    noise_type: this.noise_type,
+    variant_no: this.variant_no,
+    points_shape_x: this.points_shape_x,
+    points_shape_y: this.points_shape_y,
+    threshold_range: this.threshold_range,
+    steps: this.steps,
+    bg_color: this.bg_color,
+    a_color: this.a_color,
+    b_color: this.b_color,
+};
             }
         },
         methods: {
             download_file: function () {
-                manager.download_file('noise_playground');
+                this.manager.download_file('noise_playground');
             },
-            generate_noise: function () {
-                this.cell_noise.init();
-                this.manager.generate(function () {
-                    //alert('finished!');
-                });
+            regenerate: function () {
+                this.manager.init_maker();
+                this.manager.generate(function () {});
             }
         },
         watch: {
-            event_aggregater: function (new_val, old_val) {
-                console.log('watch');
-                console.log(new_val);
-                console.log(this.dd);
+            event_aggregater: function (params, old_val) {
+                this.regenerate_with_new_params();
             }
         },
         mounted: function () {
-            this.dd = 'd';
-
-            var canvas = document.getElementById("canvas");
-            var params = {
-                points_shape: [2, 3],
-                threshold_range: [0, 0.7],
-                steps: 14
-            };
-
-            this.manager = new Manager(canvas);
-            this.white_noise = new WhiteNoise();
-            this.white_noise.set_variant_no(1);
-            this.white_noise.set_canvas_width(canvas.width);
-            this.white_noise.set_canvas_height(canvas.height);
-            this.white_noise.set_params({});
-            this.white_noise.init();
-            this.cell_noise = new CellNoise();
-            this.cell_noise.set_variant_no(3);
-            this.cell_noise.set_canvas_width(canvas.width);
-            this.cell_noise.set_canvas_height(canvas.height);
-            this.cell_noise.set_params(params);
-            this.cell_noise.init();
-            this.manager.set_maker(this.cell_noise);
-            this.manager.generate(function () {
-                //alert('finished!');
-            });
-
+            this.manager = new Manager(document.getElementById("canvas"));
+            this.manager.set_maker(this.event_aggregater);
+            this.manager.init_maker();
+            this.manager.generate(function () {});
+            var vue_instance = this;
+            this.regenerate_with_new_params = _.throttle(function(){
+                vue_instance.manager.set_maker(vue_instance.event_aggregater);
+                vue_instance.manager.init_maker();
+                vue_instance.manager.generate(function () {});
+            }, 300);
         }
     };
     const app = Vue.createApp(App);

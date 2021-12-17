@@ -1,6 +1,6 @@
 import {Vector3} from './vector3.js';
 class Color3 extends Vector3 {
-    constructor( r=255, g=255, b=255 ) {
+    constructor( r=1, g=1, b=1 ) {
 		super(r,g,b);
 	}
     get r(){
@@ -22,13 +22,14 @@ class Color3 extends Vector3 {
         return this.z = val;
     }
     rand(){
-		this.r = Math.floor(Math.random() * 256);
-		this.g = Math.floor(Math.random() * 256);
-		this.b = Math.floor(Math.random() * 256);
+		this.r = Math.random();
+		this.g = Math.random();
+		this.b = Math.random();
         return this;
     }
-    to_arr(){
-        return [this.r,this.g,this.b];
+    //color range from 0 to 255 has steps 256
+    to_arr(steps){
+        return [Math.floor(this.r * steps),Math.floor(this.g * steps),Math.floor(this.b * steps)];
     }
 }
 export {Color3};
